@@ -4,6 +4,10 @@ import filters
 import generic
 
 TABLE_NAME="sample"
+COL_ID='id'
+COL_COVID_PPM='covidPPM'
+COL_LOCATION_ID='locationID'
+COL_COLLECTOR_ID='collectorID'
 
 def drop_sample_table(db=config.DB_NAME):
     generic.drop_table(TABLE_NAME,db)
