@@ -31,7 +31,7 @@ def create_location_table(db=config.DB_NAME):
 
 
 def insert_location(values,db=config.DB_NAME):
-    print(f"insert_location()")
+    print(f"insert_location(values={values},db={db})")
     connection = sqlite3.connect(db)
     cursor = connection.cursor()
     sql = f"""
@@ -75,11 +75,11 @@ def test_location():
     id1=insert_location({
         'name': 'uc', 
         'latitude': 3.14, 
-        'longitude': 7.77})
+        'longitude': 7.77},db)
     id2=insert_location({
         'name': 'confluence', 
         'latitude': 4.13, 
-        'longitude': 9.01})
+        'longitude': 9.01},db)
     row1=select_location_by_id(id1,db)
     row2=select_location_by_id(id2,db)
     rowNone=select_location_by_id(32984057,db)
