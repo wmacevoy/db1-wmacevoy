@@ -14,7 +14,7 @@ def create_sample_table(db=config.DB_NAME):
     cursor = connection.cursor()
     sql = """
     create table if not exists sample (
-        id integer primary key,
+        ID integer primary key,
         covidPPM real,
         locationID integer,
         collectorID integer

@@ -4,49 +4,54 @@ import filters
 import generic
 
 TABLE_NAME="location"
+COL_ID="id"
+COL_NAME="name"
+COL_LATITUDE="latitude"
+COL_LONGITUDE="longitude"
 
 def drop_location_table(db=config.DB_NAME):
     generic.drop_table(TABLE_NAME,db)
 
-def create_sample_table(db=config.DB_NAME):
-    print("create_sample_table()")
+def create_location_table(db=config.DB_NAME):
+    print("create_location_table()")
     connection = sqlite3.connect(db)
     cursor = connection.cursor()
-    sql = """
-    create table if not exists sample (
-        id integer primary key,
-        covidPPM real,
-        locationID integer,
-        collectorID integer
+    sql = f"""
+    create table if not exists {TABLE_NAME} (
+        {COL_ID} integer primary key,
+        {COL_NAME} text not null,
+        {COL_LATITUDE} real not null,
+        {COL_LONGITUDE} real not null
     )
     """
+    print("sql=" + sql)
     cursor.execute(sql)
     connection.commit()
     connection.close()
 
 
-def insert_sample(values,db=config.DB_NAME):
-    print("insert_sample()")
+def insert_location(values,db=config.DB_NAME):
+    print(f"insert_location()")
     connection = sqlite3.connect(db)
     cursor = connection.cursor()
-    sql = """
-      insert into sample (covidPPM, collectorID, locationID)
-      values (:covidPPM, :collectorID, :locationID)
+    sql = f"""
+      insert into {TABLE_NAME} ({COL_NAME}, {COL_LATITUDE}, {COL_LONGITUDE})
+      values (:{COL_NAME}, :{COL_LATITUDE}, :{COL_LONGITUDE})
       """
-    params = {'covidPPM': filters.realOrNull(values['covidPPM']), 
-        'locationID': filters.integerOrNull(values['locationID']), 
-        'collectorID': filters.integerOrNull(values['collectorID']) }
+    params = {COL_NAME: filters.dbString(values[COL_NAME]), 
+        COL_LATITUDE: filters.dbReal(values[COL_LATITUDE]), 
+        COL_LONGITUDE: filters.dbReal(values[COL_LONGITUDE]) }
     cursor.execute(sql,params)
     connection.commit()
     connection.close()
     return cursor.lastrowid
 
-def select_sample_by_id(id,db=config.DB_NAME):
-    print("select_sample_by_id()")
+def select_location_by_id(id,db=config.DB_NAME):
+    print("select_location_by_id()")
     connection = sqlite3.connect(db)
     cursor = connection.cursor()
-    sql = """
-      select collectorID, covidPPM, locationID from sample
+    sql = f"""
+      select name, latitude, longitude from {TABLE_NAME}
       where (ID = :ID)
       """
     params = {'ID': filters.dbInteger(id)}
@@ -55,30 +60,36 @@ def select_sample_by_id(id,db=config.DB_NAME):
     if response != None:
         return {
             'ID' : filters.dbInteger(id),
-            'collectorID': response[0],
-            'covidPPM': response[1],
-            'locationID': response[2]
+            'name': response[0],
+            'latitude': response[1],
+            'longitude': response[2]
         }
     else:
         return None
     connection.close()
 
-def test_sample():
+def test_location():
     db=config.DB_TEST_NAME
-    drop_sample_table(db)
-    create_sample_table(db)
-    id1=insert_sample({'covidPPM': '3.14', 'locationID': 1, 'collectorID': 2},db)
-    id2=insert_sample({'covidPPM': 5.00, 'locationID': 13, 'collectorID': 22},db)
-    row1=select_sample_by_id(id1,db)
-    row2=select_sample_by_id(id2,db)
-    rowNone=select_sample_by_id(32984057,db)
+    drop_location_table(db)
+    create_location_table(db)
+    id1=insert_location({
+        'name': 'uc', 
+        'latitude': 3.14, 
+        'longitude': 7.77})
+    id2=insert_location({
+        'name': 'confluence', 
+        'latitude': 4.13, 
+        'longitude': 9.01})
+    row1=select_location_by_id(id1,db)
+    row2=select_location_by_id(id2,db)
+    rowNone=select_location_by_id(32984057,db)
     if rowNone != None:
         raise ValueError('not none')
     if row1['ID'] != id1:
         raise ValueError('id1 id wrong:' + str(row1['ID']))
-    if row1['covidPPM'] != 3.14:
-        raise ValueError('id1 sample wrong.')
-    if row2['locationID'] != 13:
+    if row1['name'] != 'uc':
+        raise ValueError('id1 location wrong.')
+    if row2['latitude'] != 4.13:
         raise ValueError('id2 location wrong.')
-    if row2['collectorID'] != 22:
-        raise ValueError('id2 collector wrong.')
+    if row2['longitude'] != 9.01:
+        raise ValueError('id2 location wrong.')
