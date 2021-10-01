@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import random
 
 import sample
 import location
@@ -50,4 +51,9 @@ def setup():
             locationId = ucId
         else:
             locationId = confluenceId
-        
+        covidPPM = random.random()
+        sample.insert_sample({
+            sample.COVID_PPM: covidPPM,
+            sample.LOCATION_ID: locationId,
+            sample.COLLECTOR_ID: collectorId
+        })

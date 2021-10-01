@@ -81,7 +81,7 @@ def test_collector():
     rowNone=select_collector_by_id(32984057,db)
     if rowNone != None:
         raise ValueError('not none')
-    if row1['ID'] != id1:
+    if row1['id'] != id1:
         raise ValueError('id1 id wrong:' + str(row1['ID']))
     if row1['name'] != 'alice':
         raise ValueError('id1 name wrong.')
