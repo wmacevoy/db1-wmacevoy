@@ -45,6 +45,11 @@ def insert_sample(values,db=config.DB_NAME):
     connection.close()
     return cursor.lastrowid
 
+def select_sample_id_by_location(location, db=config.DB_NAME):
+# TODO 
+    sql="""
+    select id from sample inner join location on (sample.locationID = location.id) where (location.name = :location)
+    """
 def select_sample_by_id(id,db=config.DB_NAME):
     print("select_sample_by_id()")
     connection = sqlite3.connect(db)
