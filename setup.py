@@ -31,14 +31,14 @@ def setup():
 
     ucId = location.insert_location({
         location.COL_NAME: 'uc',
-        location.location.COL_LATITUDE: 3.14,
-        location.location.COL_LONGITUDE: 33.33
+        location.COL_LATITUDE: 3.14,
+        location.COL_LONGITUDE: 33.33
     })
 
     confluenceId = location.insert_location({
         location.COL_NAME: 'confluence',
-        location.location.COL_LATITUDE: 21.22,
-        location.location.COL_LONGITUDE: 44.44
+        location.COL_LATITUDE: 21.22,
+        location.COL_LONGITUDE: 44.44
     })
     
 
@@ -53,7 +53,11 @@ def setup():
             locationId = confluenceId
         covidPPM = random.random()
         sample.insert_sample({
-            sample.COVID_PPM: covidPPM,
-            sample.LOCATION_ID: locationId,
-            sample.COLLECTOR_ID: collectorId
+            sample.COL_COVID_PPM: covidPPM,
+            sample.COL_LOCATION_ID: locationId,
+            sample.COL_COLLECTOR_ID: collectorId
         })
+
+if __name__ == '__main__':
+    print ('setup()')
+    setup()
