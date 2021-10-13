@@ -45,11 +45,23 @@ def insert_sample(values,db=config.DB_NAME):
     connection.close()
     return cursor.lastrowid
 
-def select_sample_id_by_location(location, db=config.DB_NAME):
-# TODO 
-    sql="""
-    select id from sample inner join location on (sample.locationID = location.id) where (location.name = :location)
+def select_sample_id_by_location_name(location_name, db=config.DB_NAME):
+    connection = sqlite3.connect(db)
+    cursor = connection.cursor()
+    sql=f"""
+    select sample.id, location.id from sample inner join location on (sample.locationID = location.id) where (location.name = :location_name)
     """
+    params = {'location_name': filters.dbString(location_name)}
+    cursor.execute(sql,params)
+    response=cursor.fetchall()
+    connection.close()
+    if response != None:
+        print(response)
+        return response
+    else:
+        print(f"no records at location {location_name}.")
+        return None
+
 def select_sample_by_id(id,db=config.DB_NAME):
     print("select_sample_by_id()")
     connection = sqlite3.connect(db)

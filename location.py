@@ -93,3 +93,6 @@ def test_location():
         raise ValueError('id2 location wrong.')
     if row2['longitude'] != 9.01:
         raise ValueError('id2 location wrong.')
+
+if __name__ == '__main__':
+    test_location()
