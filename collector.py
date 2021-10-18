@@ -56,6 +56,7 @@ def select_collector_by_id(id,db=config.DB_NAME):
     params = {COL_ID: filters.dbInteger(id)}
     cursor.execute(sql,params)
     response=cursor.fetchone()
+    connection.close()
     if response != None:
         return {
             COL_ID : filters.dbInteger(id),
@@ -64,7 +65,30 @@ def select_collector_by_id(id,db=config.DB_NAME):
         }
     else:
         return None
+
+
+def select_collector_by_name(name,db=config.DB_NAME):
+    print("select_collector_by_name()")
+    connection = sqlite3.connect(db)
+    cursor = connection.cursor()
+    sql = f"""
+      select {COL_ID}, {COL_NAME}, {COL_EMAIL} from {TABLE_NAME}
+      where ({COL_NAME} = :{COL_NAME})
+      """
+
+    print('sql='+sql)
+    params = {COL_NAME: filters.dbString(name)}
+    cursor.execute(sql,params)
+    response=cursor.fetchone()
     connection.close()
+    if response != None:
+        return {
+            COL_ID : response[0],
+            COL_NAME: response[1],
+            COL_EMAIL: response[2]
+        }
+    else:
+        return None
 
 def test_collector():
     db=config.DB_TEST_NAME
@@ -87,3 +111,7 @@ def test_collector():
         raise ValueError('id1 name wrong.')
     if row2['email'] != 'bob@peeps.com':
         raise ValueError('id2 email wrong.')
+    
+    alice=select_collector_by_name('alice',db)
+    if alice['id'] != id1:
+        raise ValueError('wrong record for alice')
