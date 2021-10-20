@@ -51,22 +51,44 @@ def select_location_by_id(id,db=config.DB_NAME):
     connection = sqlite3.connect(db)
     cursor = connection.cursor()
     sql = f"""
-      select name, latitude, longitude from {TABLE_NAME}
-      where (ID = :ID)
+      select {COL_NAME}, {COL_LATITUDE}, {COL_LONGITUDE} from {TABLE_NAME}
+      where ({COL_ID} = :{COL_ID})
       """
-    params = {'ID': filters.dbInteger(id)}
+    params = {COL_ID: filters.dbInteger(id)}
     cursor.execute(sql,params)
     response=cursor.fetchone()
+    connection.close()
     if response != None:
         return {
-            'ID' : filters.dbInteger(id),
-            'name': response[0],
-            'latitude': response[1],
-            'longitude': response[2]
+            COL_ID : filters.dbInteger(id),
+            COL_NAME: response[0],
+            COL_LATITUDE: response[1],
+            COL_LONGITUDE: response[2]
         }
     else:
         return None
+
+def select_location_by_name(name,db=config.DB_NAME):
+    print("select_location_by_name()")
+    connection = sqlite3.connect(db)
+    cursor = connection.cursor()
+    sql = f"""
+      select {COL_ID}, {COL_NAME}, {COL_LATITUDE}, {COL_LONGITUDE} from {TABLE_NAME}
+      where ({COL_NAME} = :{COL_NAME})
+      """
+    params = {COL_NAME: filters.dbString(name)}
+    cursor.execute(sql,params)
+    response=cursor.fetchone()
     connection.close()
+    if response != None:
+        return {
+            COL_ID : response[0],
+            COL_NAME: response[1],
+            COL_LATITUDE: response[2],
+            COL_LONGITUDE: response[3]
+        }
+    else:
+        return None
 
 def test_location():
     db=config.DB_TEST_NAME
@@ -85,14 +107,18 @@ def test_location():
     rowNone=select_location_by_id(32984057,db)
     if rowNone != None:
         raise ValueError('not none')
-    if row1['ID'] != id1:
-        raise ValueError('id1 id wrong:' + str(row1['ID']))
+    if row1['id'] != id1:
+        raise ValueError('id1 id wrong:' + str(row1['id']))
     if row1['name'] != 'uc':
         raise ValueError('id1 location wrong.')
     if row2['latitude'] != 4.13:
         raise ValueError('id2 location wrong.')
     if row2['longitude'] != 9.01:
         raise ValueError('id2 location wrong.')
+    uc=select_location_by_name('uc',db)
+    if uc['id'] != id1:
+        raise ValueError('wrong record for uc')
+
 
 if __name__ == '__main__':
     test_location()
