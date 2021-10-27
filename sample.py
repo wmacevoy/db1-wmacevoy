@@ -45,6 +45,40 @@ def insert_sample(values,db=config.DB_NAME):
     connection.close()
     return cursor.lastrowid
 
+def select_min_and_max_by_location_name(location_name, db=config.DB_NAME):
+    connection = sqlite3.connect(db)
+    cursor = connection.cursor()
+    sql=f"""
+    select min(*), max(*) from sample inner join location on (sample.locationID = location.id) where (location.name = :location_name)
+    """
+    params = {'location_name': filters.dbString(location_name)}
+    cursor.execute(sql,params)
+    response=cursor.fetchall()
+    connection.close()
+    if response != None:
+        min=response[0][0]
+        max=response[0][1]
+        print((min,max))
+        return response
+    else:
+        print(f"no records at location {location_name}.")
+        return None
+
+def select_rows_by_location_and_sample_range(location, a, b, db=config.DB_NAME):
+    connection = sqlite3.connect(db)
+    cursor = connection.cursor()
+    sql=f"""
+    select {COL_ID} from {TABLE_NAME} inner join location on (sample.{COL_LOCATION_ID} = location.id) 
+        where (location.name = :location_name and sample.covidPPM >= :a and sample.covidPPM <= :b)
+    """
+    params = {'location_name': filters.dbString(location_name), 
+                'a': filters.dbReal(a), 'b': filters.dbReal(b)}
+    cursor.execute(sql,params)
+    response=cursor.fetchall()
+    connection.close()
+    print (response)
+    return response
+
 def select_sample_id_by_location_name(location_name, db=config.DB_NAME):
     connection = sqlite3.connect(db)
     cursor = connection.cursor()
