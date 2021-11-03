@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-def googleform2sqllitedatetime(formTime):
+def googleform2isoformat(formTime):
     try:
         dt = datetime.strptime(formTime, '%m/%d/%Y %H:%M:%S.%f')
     except ValueError:
@@ -10,10 +10,3 @@ def googleform2sqllitedatetime(formTime):
     iso = dt.isoformat()
     return iso
 
-formTime="11/2/2021 16:16:14"
-dbTime="2021-11-02T16:16:14"
-
-result=googleform2sqllitedatetime(formTime)
-
-if (dbTime != result):
-    raise ValueError(result)

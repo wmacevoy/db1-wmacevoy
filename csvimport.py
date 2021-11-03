@@ -7,6 +7,7 @@ import collector
 import location
 import filters
 import sys
+import googleform2isoformat
 
 def createRecord(row,db=config.DB_NAME):
     print(f"createRecord({row})")
@@ -27,7 +28,10 @@ def createRecord(row,db=config.DB_NAME):
     covidPPM=filters.dbReal(row['covidPPM'])
     if covidPPM < 0:
         raise ValueError(f"invalid covid ppm value.")
+
+    timestamp=googleform2isoformat.googleform2isoformat(row['Timestamp'])
     sampleId=sample.insert_sample({
+        sample.COL_TIMESTAMP: timestamp,
         sample.COL_COVID_PPM: covidPPM, 
         sample.COL_COLLECTOR_ID: collectorId, 
         sample.COL_LOCATION_ID : locationId},db)
