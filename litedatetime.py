@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-import datetime
-# import dateutil.parser
-import pytz
+from datetime import datetime
 
 def googleform2sqllitedatetime(formTime):
-#     dt = dateutil.parser.parse(formTime)
-    dt = datetime.datetime.strptime(formTime,"%m/%d/%Y %H:%M:%S")
+    try:
+        dt = datetime.strptime(formTime, '%m/%d/%Y %H:%M:%S.%f')
+    except ValueError:
+        dt = datetime.strptime(formTime, '%m/%d/%Y %H:%M:%S')
     iso = dt.isoformat()
     return iso
 
